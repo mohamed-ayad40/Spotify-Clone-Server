@@ -51,8 +51,8 @@ app.use(express.json());
 app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
-    saveUninitialized: true,
-    cookie: {secure: true, sameSite: "none", maxAge: 1000000000000, path: "/", httpOnly: true, priority: "high"},
+    saveUninitialized: false,
+    cookie: {secure: false, sameSite: "none", maxAge: 1000000000000, path: "/", httpOnly: true, priority: "high"},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
