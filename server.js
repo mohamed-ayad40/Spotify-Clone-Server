@@ -118,7 +118,7 @@ passport.use(
     new GoogleStrategy({
         clientID: clientId,
         clientSecret: clientSecret,
-        callbackURL: "/auth/google/callback",
+        callbackURL: "https://spotify-clone-server-tau.vercel.app/auth/google/callback",
         scope: ["profile", "email"]
     }, async (accessToken, refreshToken, profile, done) => {
         try {
@@ -259,8 +259,8 @@ app.use("/api/user", userRouter);
 app.get("/auth/google", passport.authenticate("google", {scope: ["profile", "email"]}));
 
 app.get("/auth/google/callback", passport.authenticate("google", {
-    successRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/", // https://mohamed-ayad40.github.io/
-    failureRedirect: "http://localhost:5173/login/failed"
+    successRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/#/", // https://mohamed-ayad40.github.io/
+    failureRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/#/login/failed"
 }));
 app.get("/" , (req, res) => {
     console.log("Mohamed")
