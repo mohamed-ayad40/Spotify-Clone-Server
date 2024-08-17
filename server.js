@@ -216,6 +216,7 @@ app.get("/failure", (req, res) => {
     console.log("failure");
 })
 app.get("/api/user/logout", (req, res) => {
+    console.log(req.session);
     req.session.destroy((err) => {
 
         res.clearCookie('connect.sid');
