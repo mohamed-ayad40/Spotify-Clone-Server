@@ -77,13 +77,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-passport.deserializeUser(async(id, done) => {
+passport.deserializeUser((id, done) => {
     console.log("Deserializing user");
     console.log("A&A")
     console.log(id);
-    const user = await userModel.findById(id);
+    userModel.findById(id).then((user) => {
+        if(user) return done(null, user);
+    })
     console.log(user);
-    if(user) return done(null, user);
 });
 
 
