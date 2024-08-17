@@ -52,7 +52,7 @@ app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: {secure: false, sameSite: "none", maxAge: 1000000000000, path: "/", httpOnly: true, priority: "high"},
+    cookie: {secure: true, sameSite: "none", maxAge: 1000000000000, path: "/", httpOnly: true, priority: "high"},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
@@ -77,6 +77,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+passport.serializeUser((user, done) => {
+    console.log("start Serializing user");
+    done(null, (user._id || user.id));
+    console.log("finish Serializing user");
+});
+
+
 passport.deserializeUser((id, done) => {
     console.log("Deserializing user");
     console.log("A&A")
@@ -85,16 +92,6 @@ passport.deserializeUser((id, done) => {
         if(user) return done(null, user);
     })
     console.log(user);
-});
-
-
-passport.deserializeUser(function(id, done) {
-    console.log("Deserializing user");
-    console.log("A&A")
-    console.log(id);
-    userModel.findById(id, function(err, user) {
-        done(err, user);
-    });
 });
 
 
@@ -262,7 +259,7 @@ app.use("/api/user", userRouter);
 app.get("/auth/google", passport.authenticate("google", {scope: ["profile", "email"]}));
 
 app.get("/auth/google/callback", passport.authenticate("google", {
-    // successRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/", // https://mohamed-ayad40.github.io/
+    successRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/", // https://mohamed-ayad40.github.io/
     failureRedirect: "http://localhost:5173/login/failed"
 }));
 app.get("/" , (req, res) => {
