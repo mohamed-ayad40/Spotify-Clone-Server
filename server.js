@@ -32,7 +32,7 @@ const port = process.env.PORT || 4000;
 // }));
 // app.use(cors(corsOptions));
 app.use(cors({
-    origin: process.env.CLIENT_HOSTED_URL,
+    // origin: process.env.CLIENT_HOSTED_URL,
     origin: "https://mohamed-ayad40.github.io",
     // origin: "http://localhost:5173",
     credentials: true,
