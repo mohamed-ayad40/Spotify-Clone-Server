@@ -265,11 +265,12 @@ app.get("/" , (req, res) => {
     console.log(req.user);
     console.log(req.session);
     console.log("Mohamed")
-    res.status(200).json({
-        status: "success",
-        message: "Logged in Successfully!",
-        user: req.user
-    })
+    // res.status(200).json({
+    //     status: "success",
+    //     message: "Logged in Successfully!",
+    //     user: req.user
+    // })
+    res.send("<div>HELLO WORLD</div>");
 })
 app.get("/login/failed", (req, res) => {
     res.status(401).json({
