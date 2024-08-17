@@ -262,7 +262,7 @@ app.use("/api/user", userRouter);
 app.get("/auth/google", passport.authenticate("google", {scope: ["profile", "email"]}));
 
 app.get("/auth/google/callback", passport.authenticate("google", {
-    successRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/", // https://mohamed-ayad40.github.io/
+    // successRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/", // https://mohamed-ayad40.github.io/
     failureRedirect: "http://localhost:5173/login/failed"
 }));
 app.get("/" , (req, res) => {
