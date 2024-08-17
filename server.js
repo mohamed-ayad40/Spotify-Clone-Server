@@ -267,6 +267,7 @@ app.get("/" , (req, res) => {
     console.log("Mohamed")
     console.log(req.user);
     console.log(req.session);
+    console.log(req.sessionID);
     console.log("Mohamed")
     // res.status(200).json({
     //     status: "success",
