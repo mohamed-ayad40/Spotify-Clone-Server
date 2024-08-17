@@ -33,7 +33,7 @@ const port = process.env.PORT || 4000;
 // app.use(cors(corsOptions));
 app.use(cors({
     // origin: process.env.CLIENT_HOSTED_URL,
-    origin: "https://mohamed-ayad40.github.io",
+    origin: "https://mohamed-ayad40.github.io/Spotify-Clone-3/#/",
     // origin: "http://localhost:5173",
     credentials: true,
     methods: "GET,POST,PUT,DELETE",
@@ -51,7 +51,7 @@ app.use(express.json());
 app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {secure: true, sameSite: "none", maxAge: 1000000000000, path: "/", httpOnly: true, priority: "high"},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
