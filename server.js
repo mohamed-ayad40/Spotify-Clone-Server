@@ -52,7 +52,7 @@ app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
     saveUninitialized: true,
-    cookie: {secure: true, sameSite: "none", maxAge: 1000000000000, path: "/", httpOnly: true, priority: "high"},
+    cookie: {secure: false, sameSite: "none", maxAge: 1000000000000, path: "/", httpOnly: true, priority: "high"},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
@@ -77,10 +77,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-passport.serializeUser((user, done) => {
-    console.log("start Serializing user");
-    done(null, (user._id || user.id));
-    console.log("finish Serializing user");
+passport.deserializeUser(async(id, done) => {
+    console.log("Deserializing user");
+    console.log("A&A")
+    console.log(id);
+    const user = await userModel.findById(id);
+    console.log(user);
+    if(user) return done(null, user);
 });
 
 
