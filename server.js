@@ -47,8 +47,8 @@ app.use(cors({
 // });
 app.use((req, res, next) => {
     // Set the header to allow any origin to access this server
+    res.header('Access-Control-Allow-Origin', 'https://spotify-clone-3-psi.vercel.app');
     res.header('Access-Control-Allow-Origin', true);
-    res.header('');
     // Proceed to the next middleware or route handler
     next();
 });
