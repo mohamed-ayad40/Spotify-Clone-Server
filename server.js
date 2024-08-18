@@ -260,8 +260,8 @@ app.use("/api/user", userRouter);
 app.get("/auth/google", passport.authenticate("google", {scope: ["profile", "email"]}));
 
 app.get("/auth/google/callback", passport.authenticate("google", {
-    successRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/#/", // https://mohamed-ayad40.github.io/
-    failureRedirect: "https://mohamed-ayad40.github.io/Spotify-Clone-3/#/login/failed"
+    successRedirect: "https://spotify-clone-3-psi.vercel.app/#/", // https://mohamed-ayad40.github.io/
+    failureRedirect: "/login/failed"
 }));
 app.get("/" , (req, res) => {
     console.log("Mohamed")
