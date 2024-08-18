@@ -75,7 +75,7 @@ app.use((req, res, next) => {
 
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(passport.authenticate('session'));
 
 passport.serializeUser((user, done) => {
     console.log("start Serializing user");
