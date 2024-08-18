@@ -77,9 +77,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(passport.authenticate('session'));
 
+
 passport.serializeUser((user, done) => {
     console.log("start Serializing user");
-    done(null, (user._id || user.id));
+    process.nextTick(function() {
+        return done(null, (user._id || user.id));
+      });
+    
     console.log("finish Serializing user");
 });
 
