@@ -62,7 +62,7 @@ app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {secure: false, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
+    cookie: {secure: true, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: true},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
