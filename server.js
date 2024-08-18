@@ -259,10 +259,19 @@ app.use("/api/user", userRouter);
 
 app.get("/auth/google", passport.authenticate("google", {scope: ["profile", "email"]}));
 
-app.get("/auth/google/callback", passport.authenticate("google", {
-    successRedirect: "https://spotify-clone-3-psi.vercel.app/#/", // https://mohamed-ayad40.github.io/
-    failureRedirect: "/login/failed"
-}));
+app.get("/auth/google/callback", (req, res, next) => {
+    passport.authenticate("google", (err, user, info) => {
+        if (err) return next(err);
+        if (!user) return res.redirect("/login/failed");
+
+        req.logIn(user, (err) => {
+            if (err) return next(err);
+            // Redirect only after the session is successfully established
+            return res.redirect("https://spotify-clone-3-psi.vercel.app/#/");
+        });
+    })(req, res, next);
+});
+
 app.get("/" , (req, res) => {
     console.log("Mohamed")
     console.log(req.user);
