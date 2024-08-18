@@ -69,7 +69,7 @@ app.use(session({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
     }),
-    proxy: true
+    // proxy: true
 }));
 
 app.use((req, res, next) => {
