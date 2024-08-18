@@ -221,7 +221,7 @@ app.get("/api/user/logout", (req, res) => {
 
         res.clearCookie('connect.sid');
 
-        res.redirect("https://mohamed-ayad40.github.io/Spotify-Clone-3");
+        res.redirect("https://spotify-clone-3-psi.vercel.app/");
         // res.status(200).json({
         //     message: "Logged out successfully!"
         // });
