@@ -54,8 +54,8 @@ app.use(cors({
 //     // Proceed to the next middleware or route handler
 //     next();
 // });
-app.enable("trust proxy");
-app.set("trust proxy", 1);
+// app.enable("trust proxy");
+// app.set("trust proxy", 1);
 connectDB();
 connectCloudinary();
 app.use(express.json());
@@ -64,7 +64,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     name: 'MyCoolWebAppCookieName',
-    cookie: {secure: true, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
+    cookie: {secure: false, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
