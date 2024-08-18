@@ -54,7 +54,7 @@ app.use((req, res, next) => {
     // Proceed to the next middleware or route handler
     next();
 });
-// app.enable("trust proxy");
+app.enable("trust proxy");
 connectDB();
 connectCloudinary();
 app.use(express.json());
