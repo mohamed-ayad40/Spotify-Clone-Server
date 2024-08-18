@@ -46,14 +46,14 @@ app.use(cors({
 //     next();
 // });
 
-app.use((req, res, next) => {
-    // res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization", "Set-Cookie");
-    // Set the header to allow any origin to access this server
-    // res.header('Access-Control-Allow-Origin', 'https://spotify-clone-3-psi.vercel.app');
-    // res.header('Access-Control-Allow-Origin', true);
-    // Proceed to the next middleware or route handler
-    next();
-});
+// app.use((req, res, next) => {
+//     // res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization", "Set-Cookie");
+//     // Set the header to allow any origin to access this server
+//     // res.header('Access-Control-Allow-Origin', 'https://spotify-clone-3-psi.vercel.app');
+//     // res.header('Access-Control-Allow-Origin', true);
+//     // Proceed to the next middleware or route handler
+//     next();
+// });
 app.enable("trust proxy");
 app.set("trust proxy", 1);
 connectDB();
