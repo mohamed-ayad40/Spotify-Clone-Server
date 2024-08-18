@@ -55,6 +55,7 @@ app.use((req, res, next) => {
     next();
 });
 app.enable("trust proxy");
+app.set("trust proxy", 1);
 connectDB();
 connectCloudinary();
 app.use(express.json());
@@ -62,11 +63,13 @@ app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {secure: true, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: true},
+    name: 'MyCoolWebAppCookieName',
+    cookie: {secure: true, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
-    })
+    }),
+    proxy: true
 }));
 
 app.use((req, res, next) => {
