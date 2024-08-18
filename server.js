@@ -34,8 +34,8 @@ const port = process.env.PORT || 4000;
 
 app.use(cors({
     // origin: process.env.CLIENT_HOSTED_URL,
-    // origin: "https://spotify-clone-3-psi.vercel.app",
-    origin: "http://localhost:5173",
+    origin: "https://spotify-clone-3-psi.vercel.app",
+    // origin: "http://localhost:5173",
     credentials: true,
     methods: "GET,POST,PUT,DELETE",
     sameSite: "none"
@@ -54,8 +54,8 @@ app.use(cors({
 //     // Proceed to the next middleware or route handler
 //     next();
 // });
-// app.enable("trust proxy");
-// app.set("trust proxy", 1);
+app.enable("trust proxy");
+app.set("trust proxy", 1);
 connectDB();
 connectCloudinary();
 app.use(express.json());
@@ -63,8 +63,8 @@ app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
     saveUninitialized: false,
-    // name: 'MyCoolWebAppCookieName',
-    cookie: {secure: false, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
+    name: 'MyCoolWebAppCookieName',
+    cookie: {secure: true, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
