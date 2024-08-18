@@ -45,6 +45,11 @@ app.use(cors({
 //     res.setHeader("Permission-Policy", "interest-cohort=()");
 //     next();
 // });
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true) // allow any origin
+    .AllowCredentials()); // allow credentials
 app.use((req, res, next) => {
     // Set the header to allow any origin to access this server
     res.header('Access-Control-Allow-Origin', 'https://spotify-clone-3-psi.vercel.app');
@@ -52,6 +57,7 @@ app.use((req, res, next) => {
     // Proceed to the next middleware or route handler
     next();
 });
+app.enable("trust proxy");
 connectDB();
 connectCloudinary();
 app.use(express.json());
