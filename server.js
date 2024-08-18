@@ -265,9 +265,10 @@ app.get("/auth/google/callback", (req, res, next) => {
         if (!user) return res.redirect("/login/failed");
 
         req.logIn(user, (err) => {
+            console.log(user);
             if (err) return next(err);
             // Redirect only after the session is successfully established
-            // return res.redirect("https://spotify-clone-3-psi.vercel.app/#/");
+            return res.redirect("https://spotify-clone-3-psi.vercel.app/#/");
         });
     })(req, res, next);
 });
