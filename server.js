@@ -63,7 +63,7 @@ app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
     saveUninitialized: false,
-    name: 'MyCoolWebAppCookieName',
+    // name: 'MyCoolWebAppCookieName',
     cookie: {secure: false, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
     store: MongoStore.create({
         // mongoUrl: process.env.MONGODB_SESSIONS_URI,
