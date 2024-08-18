@@ -267,7 +267,7 @@ app.get("/auth/google/callback", (req, res, next) => {
         req.logIn(user, (err) => {
             if (err) return next(err);
             // Redirect only after the session is successfully established
-            return res.redirect("https://spotify-clone-3-psi.vercel.app/#/");
+            // return res.redirect("https://spotify-clone-3-psi.vercel.app/#/");
         });
     })(req, res, next);
 });
