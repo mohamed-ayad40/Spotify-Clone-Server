@@ -182,13 +182,17 @@ app.post('/api/user/login', async (req, res) => {
             });
         }
         req.session.authenticated = true;
-        console.log(req.session);
-        console.log(req.sessionID);
-        return res.status(200).json({
-            status: "success",
-            message: "Successfully authenticated",
-            user
-        })
+        req.login(user, function(err) {
+            if (err) { return next(err); }
+            console.log(req.session);
+            console.log(req.sessionID);
+            return res.status(200).json({
+                status: "success",
+                message: "Successfully authenticated",
+                user
+            })
+          });
+
     } catch (err) {
         console.log(err);
         return res.status(200).json({
