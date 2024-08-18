@@ -31,12 +31,7 @@ const port = process.env.PORT || 4000;
 //     maxAge: 24 * 60 * 60 * 100,
 // }));
 // app.use(cors(corsOptions));
-app.use((req, res, next) => {
-    // Set the header to allow any origin to access this server
-    res.header('Access-Control-Allow-Origin', '*');
-    // Proceed to the next middleware or route handler
-    next();
-});
+
 app.use(cors({
     // origin: process.env.CLIENT_HOSTED_URL,
     origin: "https://spotify-clone-3-psi.vercel.app",
@@ -50,7 +45,12 @@ app.use(cors({
 //     res.setHeader("Permission-Policy", "interest-cohort=()");
 //     next();
 // });
-
+app.use((req, res, next) => {
+    // Set the header to allow any origin to access this server
+    res.header('Access-Control-Allow-Origin', '*');
+    // Proceed to the next middleware or route handler
+    next();
+});
 connectDB();
 connectCloudinary();
 app.use(express.json());
