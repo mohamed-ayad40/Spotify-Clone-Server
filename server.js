@@ -44,7 +44,12 @@ app.use(cors({
 //     res.setHeader("Permission-Policy", "interest-cohort=()");
 //     next();
 // });
-
+app.use((req, res, next) => {
+    // Set the header to allow any origin to access this server
+    res.header('Access-Control-Allow-Origin', '*');
+    // Proceed to the next middleware or route handler
+    next();
+});
 connectDB();
 connectCloudinary();
 app.use(express.json());
