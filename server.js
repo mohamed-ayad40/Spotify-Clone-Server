@@ -18,6 +18,18 @@ import { fileURLToPath } from 'url';
 import UserModel from "./src/models/userModel.js";
 import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
+import dns from "dns"
+const isProduction = process.env.NODE_ENV === "production";
+const CLIENT_URL = isProduction 
+    ? "https://spotify-clone-3-psi.vercel.app" 
+    : "http://localhost:5173";
+const SERVER_URL = isProduction 
+    ? "https://spotify-clone-server-tau.vercel.app" 
+    : "http://localhost:4000";
+    // هيشتغل عندك بس عشان يحل مشكلة مزود الخدمة، ومش هيأثر على Vercel
+if (!isProduction) {
+    dns.setServers(["1.1.1.1", "8.8.8.8"]);
+}
 // import { store } from "./src/config/mongodb.js";
 // import newRouter from "./routes/newRouter.js"
 const clientId = process.env.CLIENT_ID;
@@ -34,11 +46,10 @@ const port = process.env.PORT || 4000;
 
 app.use(cors({
     // origin: process.env.CLIENT_HOSTED_URL,
-    origin: "https://spotify-clone-3-psi.vercel.app",
+    origin: CLIENT_URL,
     // origin: "http://localhost:5173",
     credentials: true,
     methods: "GET,POST,PUT,DELETE",
-    sameSite: "none"
 }));
 // app.use(cors());
 // app.use((req, res, next) => {
@@ -54,32 +65,27 @@ app.use(cors({
 //     // Proceed to the next middleware or route handler
 //     next();
 // });
-app.enable("trust proxy");
+// app.enable("trust proxy");
 app.set("trust proxy", 1);
-connectDB();
+await connectDB();
 connectCloudinary();
 app.use(express.json());
 app.use(session({
     secret: process.env.CLIENT_SECRET,
     resave: false,
     saveUninitialized: false,
-    name: 'MyCoolWebAppCookieName',
-    cookie: {secure: true, key: ["ssss"], sameSite: "none", maxAge: 1000000000000, path: "/", priority: "high", httpOnly: false},
+    name: 'spotifySession',
+    cookie: {
+        secure: isProduction, // True on Vercel, False on Localhost
+        sameSite: isProduction ? "none" : "lax", // Cross-site in prod, Local in dev
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true // أمان ضد هجمات الـ XSS
+    },
     store: MongoStore.create({
-        // mongoUrl: process.env.MONGODB_SESSIONS_URI,
         client: mongoose.connection.getClient()
-    }),
-    // proxy: true
+    })
 }));
 
-app.use((req, res, next) => {
-    console.log("start Middleware")
-    console.log(req.session);
-    console.log(req.sessionID);
-    console.log(req.user);
-    console.log("finish Middleware")
-    next();
-});
 // app.use(cookieSession({
 //     name: "session",
 //     keys: ["lama"],
@@ -92,23 +98,24 @@ app.use(passport.authenticate('session'));
 
 
 passport.serializeUser((user, done) => {
-    console.log("start Serializing user");
     process.nextTick(function() {
         return done(null, (user._id || user.id));
       });
-    
-    console.log("finish Serializing user");
 });
 
 
-passport.deserializeUser((id, done) => {
-    console.log("Deserializing user");
-    console.log("A&A")
-    console.log(id);
-    userModel.findById(id).then((user) => {
-        if(user) return done(null, user);
-    })
-    console.log(user);
+passport.deserializeUser(async (id, done) => {
+    try {
+        console.log("-> Deserializing ID:", id);
+        const user = await userModel.findById(id);
+        if (user) {
+            return done(null, user);
+        }
+        return done(null, false);
+    } catch (err) {
+        console.error("💥 Error in deserializeUser:", err);
+        return done(err, null);
+    }
 });
 
 
@@ -117,7 +124,6 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
   }, async (email, password, done) => {
     try {
-        console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSS")
         const user = await UserModel.findOne({ email });
         if (!user || !user?.comparePasswords(password, user?.password)) {
             return done(null, false, { message: 'Incorrect email or password.' });
@@ -135,27 +141,38 @@ passport.use(
     new GoogleStrategy({
         clientID: clientId,
         clientSecret: clientSecret,
-        callbackURL: "https://spotify-clone-server-tau.vercel.app/auth/google/callback",
+        callbackURL: `${SERVER_URL}/auth/google/callback`, // Localhost عشان الـ Debugging
         scope: ["profile", "email"]
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            console.log("Google");
-            let user = await userModel.findOne({googleId: profile.id});
-            if (!user) {
-                user = new userModel({
-                    googleId: profile.id,
-                    fullName: profile.displayName,
-                    email: profile.emails[0].value,
-                    image: profile.photos[0].value
-                });
-                await user.save();
-            };
-            return done(null, user);
+            console.log("1. Google Profile received:", profile.displayName);
+            
+            // استخدمنا let هنا عشان نعرف المتغير صح جوه الـ Try
+            let existingUser = await userModel.findOne({ googleId: profile.id });
+            
+            if (existingUser) {
+                console.log("2. User already exists in DB:", existingUser.email);
+                return done(null, existingUser);
+            }
+            
+            console.log("2. User not found, creating a new one...");
+            let newUser = new userModel({
+                googleId: profile.id,
+                fullName: profile.displayName,
+                email: profile.emails[0].value,
+                image: profile.photos[0].value
+            });
+            
+            await newUser.save();
+            console.log("3. New user saved successfully:", newUser.email);
+            return done(null, newUser);
+
         } catch (err) {
+            console.error("💥 Error in Google Strategy:", err);
             return done(err, null);
-        };
+        }
     })
-)
+);
 
 // Middleware
 
@@ -219,34 +236,39 @@ app.post('/api/user/login', async (req, res) => {
 
 
 app.get("/success", (req, res) => {
-    // console.log("AA")
-    // console.log(req.user);
-    // console.log(req);
-    // console.log("AA")
-    // req.user.password = undefined;
     res.status(200).json({
         user: req.user,
         message: "Successfully authenticated!"
     });
 })
-// app.get("/", (req, res) => {
-//     console.log(req.user);
-//     console.log("Success");
-// })
-app.get("/failure", (req, res) => {
-    console.log("failure");
-})
-app.get("/api/user/logout", (req, res) => {
-    console.log(req.session);
-    req.session.destroy((err) => {
 
-        res.clearCookie('connect.sid');
+app.get("/api/user/logout", (req, res, next) => {
+    console.log("-> Starting Logout Process...");
+    
+    // دالة مجمعة لمسح السيشن والتوجيه عشان منكررش الكود
+    const finishLogout = () => {
+        req.session.destroy((err) => {
+            if (err) console.error("Error destroying session:", err);
+            
+            console.log("-> Session destroyed in DB.");
+            res.clearCookie('spotifySession', { path: '/' });
+            console.log("-> Cookie cleared. Redirecting to Frontend...");
+            
+            res.redirect(`${CLIENT_URL}/`);
+        });
+    };
 
-        res.redirect("https://spotify-clone-3-psi.vercel.app/");
-        // res.status(200).json({
-        //     message: "Logged out successfully!"
-        // });
-    });
+    // لو الدالة بتقبل Arguments (يعني إصدار Passport جديد 0.6.0+)
+    if (req.logout && req.logout.length > 0) {
+        req.logout(function(err) {
+            if (err) { return next(err); }
+            finishLogout();
+        });
+    } else {
+        // لو إصدار Passport قديم (Synchronous)
+        req.logout();
+        finishLogout();
+    }
 });
 
 app.post("/api/user/auth", passport.authenticate("local", {
@@ -283,28 +305,20 @@ app.get("/auth/google", passport.authenticate("google", {scope: ["profile", "ema
 app.get("/auth/google/callback", (req, res, next) => {
     passport.authenticate("google", (err, user, info) => {
         if (err) return next(err);
-        if (!user) return res.redirect("/login/failed");
+        if (!user) return res.redirect(`${CLIENT_URL}/login`); // رجعه للوجين لو فشل
 
         req.logIn(user, (err) => {
-            console.log(user);
             if (err) return next(err);
-            // Redirect only after the session is successfully established
-            return res.redirect("https://spotify-clone-3-psi.vercel.app/#/");
+            
+            // 🚨 السر هنا: حفظ الجلسة في MongoDB قبل الـ Redirect
+            req.session.save(() => {
+                return res.redirect(`${CLIENT_URL}/`); 
+            });
         });
     })(req, res, next);
 });
 
 app.get("/" , (req, res) => {
-    console.log("Mohamed")
-    console.log(req.user);
-    console.log(req.session);
-    console.log(req.sessionID);
-    console.log("Mohamed")
-    // res.status(200).json({
-    //     status: "success",
-    //     message: "Logged in Successfully!",
-    //     user: req.user
-    // })
     res.send("<div>HELLO WORLD</div>");
 })
 app.get("/login/failed", (req, res) => {
@@ -315,8 +329,6 @@ app.get("/login/failed", (req, res) => {
 });
 
 app.get("/login/success", async(req, res) => {
-    // console.log(req.session);
-    // console.log(req.user);
     if(req.user) {
         res.status(200).json({
             message: "User login",
@@ -329,15 +341,6 @@ app.get("/login/success", async(req, res) => {
     }
 });
 
-app.get("/logout", (req, res, next) => {
-    console.log("looggging outttt")
-    req.logout(function(err) {
-        if(err) {
-            // console.log(err);
-            return next(err);
-        } res.redirect("http://localhost:5173")
-    })
-});
 app.listen(port, () => {
     console.log(`Server starter on port ${port}`)
 })
